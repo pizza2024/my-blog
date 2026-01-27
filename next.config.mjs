@@ -13,6 +13,14 @@ const config = {
       },
     ];
   },
+  webpack: (config) => {
+    // 添加对 ?raw 导入的支持
+    config.module.rules.push({
+      resourceQuery: /raw/,
+      type: 'asset/source',
+    });
+    return config;
+  },
 };
 
 export default withMDX(config);
