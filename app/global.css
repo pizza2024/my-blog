@@ -1,3 +1,68 @@
 @import 'tailwindcss';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
+
+/* ── 通用 ── */
+@keyframes marquee {
+  0%   { transform: translateX(100vw); }
+  100% { transform: translateX(-100%); }
+}
+
+/* ── CRT 主题 ── */
+@keyframes crt-flicker {
+  0%, 88%, 100% { opacity: 1; }
+  89% { opacity: 0.75; }
+  90% { opacity: 1; }
+  92% { opacity: 0.3; }
+  93% { opacity: 1; }
+  97% { opacity: 0.85; }
+  98% { opacity: 1; }
+}
+@keyframes crt-glitch {
+  0%, 89%, 100% { transform: translate(0,0); clip-path: none; }
+  90%            { transform: translate(-3px,0); clip-path: inset(20% 0 60% 0); }
+  91%            { transform: translate(3px,0);  clip-path: inset(60% 0 10% 0); }
+  92%            { transform: translate(0,0);    clip-path: none; }
+  95%            { transform: translate(2px,1px); }
+  96%            { transform: translate(0,0); }
+}
+@keyframes crt-glitch-shadow {
+  0%, 89%, 100% { text-shadow: none; }
+  90%            { text-shadow: -3px 0 #fff, 3px 0 #555; }
+  91%            { text-shadow:  3px 0 #fff, -3px 0 #555; }
+  92%            { text-shadow: none; }
+}
+@keyframes crt-blink {
+  0%, 49%, 100% { opacity: 1; }
+  50%, 99%      { opacity: 0; }
+}
+
+/* ── 霓虹主题 ── */
+@keyframes neon-blink {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+  20%, 24%, 55% { opacity: 0; }
+}
+@keyframes neon-border-cycle {
+  0%   { border-color: #ff0066; box-shadow: 0 0 8px #ff0066, inset 0 0 8px #ff006622; }
+  25%  { border-color: #00ff99; box-shadow: 0 0 8px #00ff99, inset 0 0 8px #00ff9922; }
+  50%  { border-color: #ffff00; box-shadow: 0 0 8px #ffff00, inset 0 0 8px #ffff0022; }
+  75%  { border-color: #00eeff; box-shadow: 0 0 8px #00eeff, inset 0 0 8px #00eeff22; }
+  100% { border-color: #ff0066; box-shadow: 0 0 8px #ff0066, inset 0 0 8px #ff006622; }
+}
+@keyframes neon-text-glow {
+  0%   { text-shadow: 0 0 8px #ff0066, 0 0 20px #ff006688; color: #ff0066; }
+  33%  { text-shadow: 0 0 8px #00ff99, 0 0 20px #00ff9988; color: #00ff99; }
+  66%  { text-shadow: 0 0 8px #ffff00, 0 0 20px #ffff0088; color: #ffff00; }
+  100% { text-shadow: 0 0 8px #ff0066, 0 0 20px #ff006688; color: #ff0066; }
+}
+@keyframes neon-pulse {
+  0%, 100% { box-shadow: 0 0 6px #ff0066, 0 0 20px #ff006666; }
+  50%       { box-shadow: 0 0 16px #ff0066, 0 0 40px #ff0066aa, 0 0 60px #ff006644; }
+}
+@keyframes neon-screen-flicker {
+  0%, 95%, 100% { filter: brightness(1); }
+  96% { filter: brightness(0.7); }
+  97% { filter: brightness(1.1); }
+  98% { filter: brightness(0.85); }
+  99% { filter: brightness(1); }
+}
