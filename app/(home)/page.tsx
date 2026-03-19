@@ -103,12 +103,12 @@ export default function HomePage() {
 
       {/* ── 悬浮主题切换器 ── */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 px-3 py-2 rounded-full border border-white/20 backdrop-blur-md bg-black/60 shadow-xl">
-        <span className="text-white/40 text-xs mr-1 select-none">主题</span>
+        <span className="text-white/40 text-xs mr-1 select-none hidden sm:inline">主题</span>
         {THEMES.map((t) => (
           <button
             key={t.id}
             onClick={() => switchTheme(t.id)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all"
+            className="flex items-center gap-1.5 rounded-full text-xs font-bold transition-all px-2 py-1.5 sm:px-3"
             style={
               theme === t.id
                 ? { background: t.activeBg, color: t.activeText }
@@ -119,7 +119,7 @@ export default function HomePage() {
               className="w-2 h-2 rounded-full inline-block shrink-0"
               style={{ background: t.dot }}
             />
-            {t.label}
+            <span className="hidden sm:inline">{t.label}</span>
           </button>
         ))}
       </div>
