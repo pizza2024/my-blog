@@ -14,13 +14,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body className="flex flex-col min-h-screen">
-        <RootProvider
-          mermaid={{
-            enabled: true,
-          }}
-        >
-          {children}
-        </RootProvider>
+        <RootProvider>{children}</RootProvider>
       </body>
     </html>
   );
