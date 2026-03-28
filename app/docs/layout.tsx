@@ -1,77 +1,93 @@
+'use client';
+
 import { source } from '@/lib/source';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions } from '@/lib/layout.shared';
 import { docs } from 'fumadocs-mdx:collections/server';
-import type { Item, Folder, Node } from 'fumadocs-core/page-tree';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-function buildCategoryTree() {
-  // docs 是 DocsCollectionEntry，docs.docs 是所有页面的数组
-  const pages = docs.docs as Array<{
+const CATEGORY_ORDER = ['AI框架', '组件', '工具', '日记'];
+
+function getAllPages() {
+  return docs.docs as Array<{
     url?: string;
     title?: string;
     description?: string;
     category?: string;
   }>;
+}
 
-  const grouped = new Map<string, Item[]>();
-  const uncategorized: Item[] = [];
+function getCategory(page: { category?: string }): string {
+  return page.category ?? '其他';
+}
 
-  for (const page of pages) {
-    const url = page.url;
-    // 跳过 index 页面
-    if (!url || url === '/docs' || url.endsWith('/index')) continue;
+function CategorySidebar() {
+  const pathname = usePathname();
+  const allPages = getAllPages();
 
-    const category = page.category;
-    const item: Item = {
-      type: 'page',
-      name: page.title ?? 'Untitled',
-      url,
-      description: page.description,
-    };
-
-    if (category) {
-      if (!grouped.has(category)) grouped.set(category, []);
-      grouped.get(category)!.push(item);
-    } else {
-      uncategorized.push(item);
-    }
+  // 按 category 分组
+  const grouped = new Map<string, typeof allPages>();
+  for (const page of allPages) {
+    if (!page.url || page.url === '/docs' || page.url.endsWith('/index')) continue;
+    const cat = getCategory(page);
+    if (!grouped.has(cat)) grouped.set(cat, []);
+    grouped.get(cat)!.push(page);
   }
 
-  const CATEGORY_ORDER = ['AI框架', '组件', '工具', '日记'];
+  // 按固定顺序排序分类
   const sortedCategories = [...grouped.keys()].sort(
     (a, b) => CATEGORY_ORDER.indexOf(a) - CATEGORY_ORDER.indexOf(b)
   );
 
-  const nodes: Node[] = [];
-
-  for (const cat of sortedCategories) {
-    const items = grouped.get(cat)!;
-    const folder: Folder = {
-      type: 'folder',
-      name: cat,
-      defaultOpen: true,
-      children: items.sort((a, b) => String(a.name).localeCompare(String(b.name))),
-    };
-    nodes.push(folder);
-  }
-
-  if (uncategorized.length > 0) {
-    nodes.push({
-      type: 'folder',
-      name: '其他',
-      defaultOpen: false,
-      children: uncategorized.sort((a, b) => String(a.name).localeCompare(String(b.name))),
-    });
-  }
-
-  return { name: 'root', children: nodes };
+  return (
+    <div className="flex flex-col gap-4 px-3 py-4 overflow-y-auto">
+      {sortedCategories.map((cat) => (
+        <div key={cat}>
+          {/* 分类标题 */}
+          <div className="text-xs font-semibold text-fd-muted-foreground uppercase tracking-wider mb-1.5 pl-2">
+            {cat}
+          </div>
+          {/* 该分类下的文章列表 */}
+          <div className="flex flex-col">
+            {grouped
+              .get(cat)!
+              .sort((a, b) => String(a.title ?? '').localeCompare(String(b.title ?? '')))
+              .map((page) => {
+                const isActive = pathname === page.url;
+                return (
+                  <Link
+                    key={page.url}
+                    href={page.url ?? '#'}
+                    className={`
+                      flex flex-col gap-0.5 rounded-md px-2 py-1.5 text-sm transition-colors
+                      ${isActive
+                        ? 'bg-fd-accent text-fd-foreground font-medium'
+                        : 'text-fd-muted-foreground hover:text-fd-foreground hover:bg-fd-accent'
+                      }
+                    `}
+                  >
+                    <span className="font-medium leading-snug">{page.title}</span>
+                  </Link>
+                );
+              })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export default function Layout({ children }: LayoutProps<'/docs'>) {
-  const tree = buildCategoryTree();
-
   return (
-    <DocsLayout tree={tree as unknown as Parameters<typeof DocsLayout>[0]['tree']} {...baseOptions()}>
+    <DocsLayout
+      tree={source.getPageTree()}
+      {...baseOptions()}
+      sidebar={{
+        defaultOpenLevel: 2,
+        component: <CategorySidebar />,
+      }}
+    >
       {children}
     </DocsLayout>
   );
