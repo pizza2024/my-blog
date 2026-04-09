@@ -1,0 +1,41 @@
+---
+title: windows通过wsl开发注意事项
+description: 
+category: 工具
+---
+
+运行时要统一到同一侧
+前端在 WSL 跑，就用 WSL 的 Node、npm、pnpm；前端在 Windows 跑，就全用 Windows 的。不要混用。
+
+先确认 WSL 里真的有 Node
+在 WSL 终端执行 node -v、npm -v。如果 node: command not found，说明你以为“在 WSL 启动”，实际并没有成功。
+
+不要在 UNC 路径下用 Windows CMD 启动 npm 脚本
+像 \\wsl.localhost\... 这种路径，CMD 常报 UNC 路径不受支持，会导致脚本行为异常。
+
+node_modules 要与运行平台一致
+在 Linux 装的依赖拿到 Windows Node 跑，或反过来，都可能触发可选依赖缺失（例如 Rollup 平台包）。跨平台切换后建议重新安装依赖。
+
+PowerShell 的 curl 不是 curl
+PowerShell 里的 curl 是 Invoke-WebRequest 别名。要做网络探测请用 curl.exe，避免参数不兼容。
+
+明确 localhost 指向哪一侧
+WSL 内的 localhost 指 WSL。Windows Docker 端口有时可直达，有时需要 host.docker.internal。代理目标要按实际网络路径设置。
+
+Vite 代理与环境变量要一致
+vite.config.ts 默认值和 .env.development 覆盖值不能冲突。你这次就是 .env.development 里 18082/18083 覆盖了正确默认值。
+
+改了 .env 或 vite 配置必须重启 dev server
+热更新不会重载代理目标和大部分启动期配置。改完配置不重启，现象看起来就像“改了没生效”。
+
+先验证后端直连，再验证前端代理
+先测 http://localhost:后端端口/... 是否 200，再测 http://127.0.0.1:5173/api/...。这样能快速判断是后端挂了还是代理挂了。
+
+启动日志里打印最终代理目标
+让 Vite 启动时输出 prefix -> target，是排查“到底转发到哪”的最快方式。这个你现在已经加上了。
+
+开发时建议固定入口地址
+统一用 http://127.0.0.1:5173（或统一用 localhost），减少同源、DNS、缓存和策略差异引发的偶发问题。
+
+端口映射以 docker ps 为准
+不要凭记忆写端口。先看 docker ps 的真实映射，再填 .env.development 和代理配置。
